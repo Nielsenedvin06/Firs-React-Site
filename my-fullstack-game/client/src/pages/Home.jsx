@@ -1,29 +1,31 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import socket from "../socket"; // Import the socket instance
 
-function Home() {
-    const [nickname, setNickname] = useState('')
-    const navigate = useNavigate();
+const Home = () => {
+  const [nickname, setNickname] = useState("");
+  const navigate = useNavigate();
 
-    const handleJoin = () =>{
-        if (nickname.trim() === '') return alert('Please enter a nickname');
-        localStorage.setItem('nickname',nickname);
-        navigate('/lobby');
-    ;}
+  const handleJoin = () => {
+    if (nickname.trim() !== "") {
+        socket.connect();
+      socket.emit("join-lobby", nickname);
+      navigate("/lobby", { state: { nickname } });
+    }
+  };
 
-    return (
-        <div style={{padding: '2rem'}}>
-            <h2>Welcome to the Game!!</h2>
-            <input 
-            type="text" 
-            placeholder="Enter your nickname" 
-            value={nickname} 
-            onChange={(e) => setNickname(e.target.value)} 
-            style={{marginRight:'1rem'}} id="" 
-            />
-            <button onClick={handleJoin}>Join Lobby</button>
-        </div>
-    )
-}
+  return (
+    <div>
+      <h1>Enter Your Nickname</h1>
+      <input
+        type="text"
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+        placeholder="Nickname"
+      />
+      <button onClick={handleJoin}>Join Lobby</button>
+    </div>
+  );
+};
 
 export default Home;

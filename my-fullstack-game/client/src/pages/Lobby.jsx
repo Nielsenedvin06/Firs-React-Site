@@ -1,24 +1,37 @@
-import { useEffect, useState } from 'react';
-import socket from '../socket';
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import socket from "../socket"; // Import the socket instance
 
-function Lobby() {
-  const [nickname, setNickname] = useState('');
+const Lobby = () => {
+  const [players, setPlayers] = useState({});
+  const location = useLocation();
+  const nickname = location.state?.nickname;
 
   useEffect(() => {
-    const name = localStorage.getItem('nickname');
-    setNickname(name || 'Unknown Player');
-
-    if (name) {
-      socket.emit('join_lobby', name);
+    if (nickname) {
+      socket.emit("join-lobby", nickname);
     }
-  }, []);
+
+    socket.on("player-list", (updatedPlayers) => {
+      setPlayers(updatedPlayers);
+    });
+
+    return () => {
+      socket.off("player-list");
+    };
+  }, [nickname]);
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>Lobby</h2>
-      <p>Welcome, <strong>{nickname}</strong>! Waiting for more players...</p>
+    <div>
+      <h1>Lobby</h1>
+      <h2>Players:</h2>
+      <ul>
+        {Object.entries(players).map(([id, name]) => (
+          <li key={id}>{name}</li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
 export default Lobby;
