@@ -1,25 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import socket from "../socket"; // Import the socket instance
+import Home from "./Home";
 
 const Lobby = () => {
   const [players, setPlayers] = useState({});
   const location = useLocation();
   const nickname = location.state?.nickname;
-
-  useEffect(() => {
-    if (nickname) {
-      socket.emit("join-lobby", nickname);
-    }
-
-    socket.on("player-list", (updatedPlayers) => {
-      setPlayers(updatedPlayers);
-    });
-
-    return () => {
-      socket.off("player-list");
-    };
-  }, [nickname]);
+    
 
   return (
     <div>
