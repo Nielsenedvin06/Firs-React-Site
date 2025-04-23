@@ -21,17 +21,21 @@ const io = new Server(server, {
 });
 
 // Handle connections
-io.on("connection", (socket) => {
+io.on('connection', (socket) => {
+  console.log(`New client connected: ${socket.id}`);
+  
   socket.on("join-lobby", (nickname) => {
     players[socket.id] = nickname;
-    io.emit("player-list", players);
+    console.log("Player joined:", nickname);
+    console.log("Players now:", players);
+    io.emit("player-list", players); // This should definitely happen
   });
-
-  socket.on("disconnect", () => {
-    delete players[socket.id];
-    io.emit("player-list", players);
+  
+    socket.on("disconnect", () => {
+      delete players[socket.id];
+      io.emit("player-list", players);
+    });
   });
-});
 
 app.get('/api/ping', (req, res) => {
   res.json({ message: 'pong from backend!' });

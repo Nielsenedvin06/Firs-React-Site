@@ -7,7 +7,24 @@ const Lobby = () => {
   const [players, setPlayers] = useState({});
   const location = useLocation();
   const nickname = location.state?.nickname;
-    
+
+  useEffect(() => {
+   console.log("Nickname in lobby:", nickname);
+
+  if (nickname) {
+    socket.emit("join-lobby", nickname);
+  }
+
+  socket.on("player-list", (updatedPlayers) => {
+    console.log("Received player list:", updatedPlayers); // ⬅️ key log
+    setPlayers(updatedPlayers);
+  });
+
+  // Clean up only the listeners, not the whole socket
+  return () => {
+    socket.off("player-list");
+  };
+  }, []);
 
   return (
     <div>
