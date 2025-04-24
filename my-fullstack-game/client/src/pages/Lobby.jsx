@@ -1,42 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import socket from "../socket"; // Import the socket instance
-import Home from "./Home";
+import { useEffect, useState } from "react";
+import { socket } from "../socket";
+import { useNavigate } from "react-router-dom";
+import { usePlayer } from "../components/PlayerContext";
 
-const Lobby = () => {
-  const [players, setPlayers] = useState({});
-  const location = useLocation();
-  const nickname = location.state?.nickname;
+export default function Lobby() {
+  const { nickname, lobby } = usePlayer();
+  const [players, setPlayers] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-   console.log("Nickname in lobby:", nickname);
+    const handlePlayerList = (updatedPlayers) => {
+      setPlayers(updatedPlayers);
+    };
 
-  if (nickname) {
-    socket.emit("join-lobby", nickname);
-  }
+    socket.on("player-list", handlePlayerList);
+    socket.emit("get-player-list", lobby);
 
-  socket.on("player-list", (updatedPlayers) => {
-    console.log("Received player list:", updatedPlayers); // ⬅️ key log
-    setPlayers(updatedPlayers);
-  });
+    return () => {
+      socket.off("player-list", handlePlayerList);
+    };
+  }, [lobby]);
 
-  // Clean up only the listeners, not the whole socket
-  return () => {
-    socket.off("player-list");
+  const startGame = () => {
+    navigate("/game");
   };
-  }, []);
 
   return (
     <div>
-      <h1>Lobby</h1>
-      <h2>Players:</h2>
+      <h1>Lobby: {lobby}</h1>
+      <h2>Nickname: {nickname}</h2>
+      <h3>Players:</h3>
       <ul>
-        {Object.entries(players).map(([id, name]) => (
-          <li key={id}>{name}</li>
+        {players.map((p, i) => (
+          <li key={i}>{p}</li>
         ))}
       </ul>
+      <button onClick={startGame}>Start Game</button>
     </div>
   );
-};
-
-export default Lobby;
+}
