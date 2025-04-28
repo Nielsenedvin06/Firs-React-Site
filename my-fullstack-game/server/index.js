@@ -22,7 +22,7 @@ const io = new Server(server, {
 
 // Handle connections
 const playersInLobby = {}; // Example: { lobby1: ['Edde'], lobby2: [] }
-
+console.log(playersInLobby);
 io.on("connection", (socket) => {
   socket.on("join-lobby", ({ nickname, lobby }) => {
     socket.join(lobby); // Join the socket.io room
@@ -31,9 +31,9 @@ io.on("connection", (socket) => {
 
     if (!playersInLobby[lobby]) playersInLobby[lobby] = [];
     playersInLobby[lobby].push(nickname);
-
+    console.log(playersInLobby);
     io.to(lobby).emit("player-list", playersInLobby[lobby]);
-
+    console.log(`User ${nickname} joined lobby ${lobby}`);
     socket.on("disconnect", () => {
       if (playersInLobby[socket.lobby]) {
         playersInLobby[socket.lobby] = playersInLobby[socket.lobby].filter(

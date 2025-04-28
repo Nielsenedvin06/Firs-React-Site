@@ -19,7 +19,7 @@ export default function Lobby() {
     return () => {
       socket.off("player-list", handlePlayerList);
     };
-  }, [lobby]);
+  }, [lobby,nickname]);
 
   const startGame = () => {
     navigate("/game");

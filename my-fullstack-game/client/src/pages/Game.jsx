@@ -18,7 +18,7 @@ export default function Game() {
     return () => {
       socket.off("player-list", handlePlayerList);
     };
-  }, [lobby]);
+  }, [lobby, nickname]);
 
   return (
     <div>
